@@ -115,6 +115,7 @@ class Auth extends CI_Controller
 	public function service_login($client_id)
 	{
 		$this->load->database();
+		$this->load->model('Access_tokens_model');
 
 		$result = $this->db->where('id', $client_id)->get('oauth_clients')->result();
 
@@ -126,21 +127,31 @@ class Auth extends CI_Controller
 		// check session
 		if (isset($this->session->email))
 		{
-			$data_to_send = $this->User_model->get_user_by_email($this->session->email)[0];
-			$data_to_send->sess_id = $this->input->get('sess_id');
+			$user_id = $this->User_model->get_user_by_email($this->session->email)[0]->id;
+			$access_token = "";
 
-			$ch = curl_init( $result[0]->redirect );
-			curl_setopt( $ch, CURLOPT_POST, 1);
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data_to_send);
-			curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt( $ch, CURLOPT_HEADER, 0);
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+			// An active token exists
+			if (
+				count($access_token_info = $this->Access_tokens_model->get_by_user_id($user_id)) > 0 &&
+				date($access_token_info['expires_on']) > date('Y-M-d h:i:s')
+			)
+			{
+				$access_token = $access_token_info['access_token'];
+			}
+			// A token for the current user does not exist or has expired
+			else
+			{
+				$access_token = bin2hex(openssl_random_pseudo_bytes(16));
 
-			$response = curl_exec( $ch );
+				$data_new_token = [
+					'access_token' => $access_token,
+					'user_id' => $user_id,
+					'revoked' => '0'
+				];
+				$this->Access_tokens_model->insert($data_new_token);
+			}
 
-			//die($response);
-
-			redirect($this->input->get('next'));
+			redirect($result[0]->redirect . '?access_token=' . $access_token . '&callback=' . $this->input->get('callback'));
 		}
 
 		$origin = $_SERVER['HTTP_REFERER'];

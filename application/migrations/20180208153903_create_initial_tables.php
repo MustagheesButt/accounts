@@ -117,7 +117,8 @@ class Migration_Create_initial_tables extends CI_Migration
 			),
 			'revoked' => array(
 				'type' => 'TINYINT',
-				'constraint' => '1'
+				'constraint' => '1',
+				'default' => '0'
 			),
 			'created_at' => array(
 				'type' => 'DATETIME'
@@ -129,11 +130,39 @@ class Migration_Create_initial_tables extends CI_Migration
 
 		$this->dbforge->add_key('id', TRUE); // TRUE for primary key
 		$this->dbforge->create_table('oauth_clients', TRUE, $attributes); // TRUE for adding IF NOT EXISTS
+
+		/* Create Table: access_tokens */
+		$this->dbforge->add_field(array(
+			'access_token' => array(
+				'type' => 'VARCHAR',
+				'constraint' => '32'
+			),
+			'user_id' => array(
+				'type' => 'BIGINT',
+				'unsigned' => TRUE,
+				'unique' => TRUE
+			),
+			'revoked' => array(
+				'type' => 'TINYINT',
+				'constraint' => '1',
+				'default' => '0'
+			),
+			'expires_on' => array(
+				'type' => 'DATETIME'
+			),
+			'created_at' => array(
+				'type' => 'DATETIME'
+			)
+		));
+
+		$this->dbforge->add_key('access_token', TRUE); // TRUE for primary key
+		$this->dbforge->create_table('access_tokens', TRUE, $attributes); // TRUE for adding IF NOT EXISTS
 	}
 
 	public function down()
 	{
 		$this->dbforge->drop_table('users');
 		$this->dbforge->drop_table('oauth_clients');
+		$this->dbforge->drop_table('access_tokens');
 	}
 }
