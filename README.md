@@ -1,6 +1,6 @@
 ## Guide On Using the Central Login System:
 
-Using our central login system is quite simple. There are 3 simple steps, listed below:
+Using our central login system is quite simple. There are 4 simple steps, listed below:
 
 ### 1. Register An App With NotesNetwork
 
@@ -33,7 +33,7 @@ NN.init({
 });
 ```
 
-4. `scope` is the data you get in response, if the login/registration is successfull. They are separated by a dot `.`. You will not get password in any case. Following are the fields you can include in scope:
+4. `<CLIENT_ID>` should be replaced by your app's client ID. `scope` is the data you get in response, if the login/registration is successfull. They are separated by a dot `.`. You will not get password in any case. Following are the fields you can include in scope:
 
 - id
 - first_name
@@ -45,7 +45,7 @@ NN.init({
 - gender
 - mobile_number
 
-5. In your `loginCallback`, you will get user data in JSON format using `response`. You probably want to `POST` it to your backend to get the user registerd or logged in to your site, set session and whatever.
+5. In your `loginCallback`, you will get user data in JSON format using `response`. You probably want to `POST` it to your backend to get the user registered or logged in to your site, set session and whatever.
 
 ### 3. Setup Callback URL Page
 
@@ -55,7 +55,8 @@ In your web application, define a route, say `/receive_access_token`, for a call
 
 `receive_access_token.html`:
 ```
-<div id="access_token"><?= $_GET['access_token'] ?></div>
+<p>Please wait while you are being redirected...</p>
+<div id="access_token" style="display: none;"><?= $_GET['access_token'] ?></div>
 
 <script type="text/javascript">
 	window.opener.NN.recieve_token(document.getElementById('access_token').innerHTML, <?= ($_GET['callback'] == TRUE ? 'true' : 'false') ?>);
@@ -76,11 +77,16 @@ def receive_access_token():
 
 `receive_access_token.html`:
 ```
-<div id="access_token">{{ access_token }}</div>
+<p>Please wait while you are being redirected...</p>
+<div id="access_token" style="display: none;">{{ access_token }}</div>
 
 <script type="text/javascript">
 	window.opener.NN.recieve_token(document.getElementById('access_token').innerHTML, {{ callback_status }});
 </script>
 ```
+
+### 4. Verify Access Token At Backend
+
+TODO
 
 That would be all for now :)
