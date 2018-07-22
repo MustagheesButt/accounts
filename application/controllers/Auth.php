@@ -13,8 +13,12 @@ class Auth extends CI_Controller
 
 	public function login_view()
 	{
-		$_SESSION = [];
-		$this->session->sess_destroy();
+		//$_SESSION = [];
+		//$this->session->sess_destroy();
+		if ($this->is_logged_in())
+		{
+			redirect(base_url() . "dashboard");
+		}
 
 		$data['title'] = 'Login';
 		$data['description'] = 'Login to your NotesNetwork account.';
@@ -39,7 +43,8 @@ class Auth extends CI_Controller
 
 		if ($this->form_validation->run() == FALSE)
 		{
-			redirect(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY));
+			$this->login_view();
+			return;
 		}
 
 		// Set session variables
@@ -80,8 +85,10 @@ class Auth extends CI_Controller
 		// Validating Mobile no. Field
 		$this->form_validation->set_rules('mobile_number', 'Mobile/Phone Number', 'regex_match[/^[0-9]{10}$/]');
 
-		if ($this->form_validation->run() == FALSE) {
-			redirect(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY));
+		if ($this->form_validation->run() == FALSE)
+		{
+			$this->login_view();
+			return;
 		}
 
 		// Insert into table
@@ -143,6 +150,8 @@ class Auth extends CI_Controller
 			{
 				$access_token = bin2hex(openssl_random_pseudo_bytes(16));
 
+				// TODO: check if the generated access_token doesn't already exists
+
 				$data_new_token = [
 					'access_token' => $access_token,
 					'user_id' => $user_id,
@@ -154,12 +163,14 @@ class Auth extends CI_Controller
 			redirect($result[0]->redirect . '?access_token=' . $access_token . '&callback=' . $this->input->get('callback'));
 		}
 
-		$origin = $_SERVER['HTTP_REFERER'];
-
 		// verify origin
-		if (substr($result[0]->redirect, 0, strlen($origin)) !== $origin)
+		$redirect = parse_url($result[0]->redirect); // components of given URL
+		$origin = parse_url($_SERVER['HTTP_REFERER']); // components of request URL
+		if ($redirect['scheme'] != $origin['scheme'] || $redirect['host'] != $origin['host'])
 		{
-			die("Origin not allowed.</br>");
+			//echo "db redirect: " . $result[0]->redirect . "</br>";
+			//echo "origin: " . $origin;
+			die("</br>Origin not allowed.</br>");
 		}
 
 		$this->require_login();

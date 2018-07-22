@@ -524,5 +524,6 @@ $config['rewrite_short_tags'] = FALSE;
 $config['proxy_ips'] = '';
 
 /* CUSTOM */
-$config['app_name'] = 'Accounts';
-$config['api_version'] = 'v1';
+$config['app_name'] = 'CentralAccounts';
+$config['app_version'] = 'v3.4';
+$config['api_version'] = 'v2.0';

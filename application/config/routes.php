@@ -58,7 +58,6 @@ $route['login']['POST'] = 'auth/login';
 
 $route['logout']['GET'] = 'auth/logout';
 
-$route['register']['GET'] = 'auth/register_view';
 $route['register']['POST'] = 'auth/register';
 
 $route['api/(:any)/(:any)']['GET'] = 'api/$1/$2';

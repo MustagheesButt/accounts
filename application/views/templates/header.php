@@ -19,14 +19,9 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                         <?php
-                            if (!isset($this->session->username))
+                            if (isset($this->session->username))
                             {
-                            	echo "<li><a class=\"nav-link\" href=\"" . base_url() . "login\">Login</a></li>";
-                            	echo "<li><a class=\"nav-link\" href=\"" . base_url() . "register\">Register</a></li>";
-                            }
-                        	else
-                        	{
-                        		echo
+                            	echo
                         		"
                         		<li class=\"nav-item dropdown\">
 	                                <a class=\"nav-link dropdown-toggle\" href=\"#\" role=\"button\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">
@@ -45,7 +40,7 @@
 	                                </div>
 	                            </li>
                         		";
-                        	}
+                            }
                         ?>
                     </ul>
                 </div>

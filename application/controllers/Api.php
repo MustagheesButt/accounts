@@ -64,16 +64,4 @@ class Api extends CI_Controller
 				$user
 			));
 	}
-
-	public function get_token()
-	{
-		$access_token = bin2hex(openssl_random_pseudo_bytes(16));
-
-		return $this->output
-			->set_content_type('application/json')
-			->set_status_header(200)
-			->set_output(json_encode(
-				$access_token
-			));
-	}
 }
